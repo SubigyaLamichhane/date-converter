@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Date Converter - Nepali & English</title>
+    <style>
+        /* Basic Reset and Font */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+                         Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f0f2f5; /* Light grey background */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top for longer content */
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Main Container for the Converter */
+        .container {
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 12px; /* Softer rounded corners */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0,0,0,0.08); /* Enhanced shadow */
+            width: 100%;
+            max-width: 960px; /* Slightly wider for better side-by-side layout */
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* Main Title of the Converter */
+        .main-title {
+            text-align: center;
+            color: #1a2b48; /* Darker, more professional blue */
+            font-size: 2.2em; /* Slightly reduced for balance */
+            margin-bottom: 0; /* Adjusted as container has gap */
+            font-weight: 600;
+        }
+
+        /* Subtitle/Description */
+        .sub-title {
+            text-align: center;
+            margin-top: -20px; /* Pulls it closer to the main title */
+            margin-bottom: 20px; /* Space before converter sections */
+            color: #555e68; /* Softer grey for subtitle */
+            font-size: 1.05em;
+        }
+
+        /* Wrapper for the two converter sections (Eng-Nep & Nep-Eng) */
+        .converters-wrapper {
+            display: flex;
+            flex-direction: row;
+            gap: 30px; /* Space between the two converter boxes */
+        }
+
+        /* Styling for individual converter sections */
+        .converter-section {
+            flex: 1; /* Each section takes equal width */
+            padding: 25px;
+            border: 1px solid #dce1e7; /* Lighter border */
+            border-radius: 10px; /* Consistent rounded corners */
+            background-color: #f8f9fa; /* Very light off-white for sections */
+        }
+
+        .converter-section h2 {
+            font-size: 1.6em; /* Adjusted title size */
+            color: #2c3e50; /* Standard section title color */
+            margin-top: 0;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Styling for form groups (label + input) */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057; /* Standard label color */
+        }
+
+        /* Styling for input fields (date, select) */
+        .form-group input[type="date"],
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px; /* More padding */
+            border: 1px solid #ced4da; /* Standard input border */
+            border-radius: 8px; /* Rounded inputs */
+            box-sizing: border-box;
+            font-size: 1em;
+            background-color: #fff;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .form-group input[type="date"]:focus,
+        .form-group select:focus {
+            border-color: #007bff; /* Highlight color on focus */
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Bootstrap-like focus */
+            outline: none;
+        }
+
+        /* Container for Nepali date dropdowns (year, month, day) */
+        .nepali-date-inputs {
+            display: flex;
+            gap: 12px; /* Space between dropdowns */
+        }
+
+        .nepali-date-inputs select {
+            flex: 1; /* Distribute space equally among year, month, day */
+        }
+
+        /* Styling for the convert button */
+        .convert-button {
+            background-color: #007bff; /* Primary blue */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.05em;
+            font-weight: 500;
+            width: 100%;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+            margin-top: 10px; /* Space above button */
+        }
+
+        .convert-button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+        .convert-button:active {
+            transform: translateY(1px); /* Slight press effect */
+        }
+
+
+        /* Styling for the result display area */
+        .result {
+            margin-top: 25px;
+            padding: 15px 20px;
+            background-color: #e9ecef; /* Light grey for result box */
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            text-align: center;
+            min-height: 60px; /* Ensure it has some height even when empty */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result p {
+            margin: 0;
+            font-size: 1.05em;
+            color: #2c3e50;
+        }
+
+        .result .date-value {
+            font-weight: bold;
+            font-size: 1.2em; /* Larger font for the date itself */
+            color: #007bff; /* Blue for the result date */
+            margin-left: 8px; /* Space from "Nepali Date:" text */
+        }
+         .result .error-message {
+            color: #dc3545; /* Red for error messages */
+            font-weight: normal;
+            font-size: 1em;
+        }
+
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 820px) { /* Adjusted breakpoint for better stacking */
+            .converters-wrapper {
+                flex-direction: column; /* Stack converters vertically */
+                gap: 25px;
+            }
+            .container {
+                padding: 20px 25px;
+            }
+            .main-title {
+                font-size: 2em;
+            }
+            .converter-section h2 {
+                font-size: 1.4em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nepali-date-inputs {
+                flex-direction: column; /* Stack Nepali date inputs vertically */
+                gap: 15px;
+            }
+             .main-title {
+                font-size: 1.7em;
+            }
+            .sub-title {
+                font-size: 0.95em;
+            }
+            .converter-section h2 {
+                font-size: 1.25em;
+            }
+            .convert-button,
+            .form-group input[type="date"],
+            .form-group select {
+                font-size: 0.95em;
+                padding: 10px 12px;
+            }
+            .result p {
+                font-size: 0.95em;
+            }
+            .result .date-value {
+                font-size: 1.1em;
+            }
+            .container {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="main-title">Date Converter</h1>
+        <p class="sub-title">Easily convert dates between English (AD/CE) and Nepali (BS) calendars.</p>
+
+        <div class="converters-wrapper">
+            <div class="converter-section" id="eng-to-nep-section">
+                <h2>English (AD) to Nepali (BS)</h2>
+                <div class="form-group">
+                    <label for="eng-date">Select English Date:</label>
+                    <input type="date" id="eng-date" name="eng-date">
+                </div>
+                <button class="convert-button" id="convertToNepaliBtn">Convert to Nepali</button>
+                <div class="result" id="nepaliResultContainer">
+                    <p>Nepali Date: <span class="date-value" id="nepaliResultDate">---</span></p>
+                </div>
+            </div>
+
+            <div class="converter-section" id="nep-to-eng-section">
+                <h2>Nepali (BS) to English (AD)</h2>
+                <div class="form-group">
+                    <label>Select Nepali Date:</label>
+                    <div class="nepali-date-inputs">
+                        <select id="nep-year" name="nep-year" aria-label="Nepali Year">
+                            <option value="">Year</option>
+                            </select>
+                        <select id="nep-month" name="nep-month" aria-label="Nepali Month">
+                            <option value="">Month</option>
+                            </select>
+                        <select id="nep-day" name="nep-day" aria-label="Nepali Day">
+                            <option value="">Day</option>
+                            </select>
+                    </div>
+                </div>
+                <button class="convert-button" id="convertToEnglishBtn">Convert to English</button>
+                <div class="result" id="englishResultContainer">
+                    <p>English Date: <span class="date-value" id="englishResultDate">---</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Element References ---
+        const engDateInput = document.getElementById('eng-date');
+        const convertToNepaliBtn = document.getElementById('convertToNepaliBtn');
+        const nepaliResultEl = document.getElementById('nepaliResultDate');
+        const nepaliResultContainer = document.getElementById('nepaliResultContainer');
+
+
+        const nepYearSelect = document.getElementById('nep-year');
+        const nepMonthSelect = document.getElementById('nep-month');
+        const nepDaySelect = document.getElementById('nep-day');
+        const convertToEnglishBtn = document.getElementById('convertToEnglishBtn');
+        const englishResultEl = document.getElementById('englishResultDate');
+        const englishResultContainer = document.getElementById('englishResultContainer');
+
+
+        // --- Constants for Nepali Date Population ---
+        // Nepali months (Bikram Sambat)
+        const NEPALI_MONTHS = [
+            { value: 1, name: 'Baishakh' }, { value: 2, name: 'Jestha' }, { value: 3, name: 'Ashadh' },
+            { value: 4, name: 'Shrawan' }, { value: 5, name: 'Bhadra' }, { value: 6, name: 'Ashwin' },
+            { value: 7, name: 'Kartik' }, { value: 8, name: 'Mangsir' }, { value: 9, name: 'Poush' },
+            { value: 10, name: 'Magh' }, { value: 11, name: 'Falgun' }, { value: 12, name: 'Chaitra' }
+        ];
+        // Current Bikram Sambat year (approximate, update as needed or get dynamically)
+        // For May 2025, it's 2082 BS.
+        const CURRENT_NEPALI_YEAR = new Date().getFullYear() + 57; // A rough estimate
+        const NEPALI_YEAR_RANGE_PAST = 100; // Number of past years to show in dropdown
+        const NEPALI_YEAR_RANGE_FUTURE = 10; // Number of future years to show
+
+        // --- Helper function to display results or errors ---
+        function displayResult(containerEl, dateEl, resultText, isError = false) {
+            if (isError) {
+                containerEl.innerHTML = `<p class="error-message">${resultText}</p>`;
+            } else {
+                // Ensure the structure is correct if it was previously an error
+                if (!dateEl || !containerEl.contains(dateEl)) {
+                     containerEl.innerHTML = `<p>${containerEl.id.includes('nepali') ? 'Nepali' : 'English'} Date: <span class="date-value"></span></p>`;
+                     dateEl = containerEl.querySelector('.date-value'); // Re-select the element
+                }
+                if(dateEl) dateEl.textContent = resultText;
+            }
+        }
+
+
+        // --- Functions to Populate Nepali Date Dropdowns ---
+        function populateNepaliYears() {
+            // Populate years from (CURRENT_NEPALI_YEAR - NEPALI_YEAR_RANGE_PAST) to (CURRENT_NEPALI_YEAR + NEPALI_YEAR_RANGE_FUTURE)
+            for (let i = CURRENT_NEPALI_YEAR - NEPALI_YEAR_RANGE_PAST; i <= CURRENT_NEPALI_YEAR + NEPALI_YEAR_RANGE_FUTURE; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i; // Display year number
+                nepYearSelect.appendChild(option);
+            }
+             nepYearSelect.value = CURRENT_NEPALI_YEAR; // Default to current estimated BS year
+        }
+
+        function populateNepaliMonths() {
+            NEPALI_MONTHS.forEach(month => {
+                const option = document.createElement('option');
+                option.value = month.value; // Store month number (1-12)
+                option.textContent = month.name; // Display month name
+                nepMonthSelect.appendChild(option);
+            });
+        }
+
+        function populateNepaliDays(maxDays = 32) {
+            // Nepali months can have up to 32 days.
+            // A real implementation needs accurate day counts for each month/year.
+            nepDaySelect.innerHTML = '<option value="">Day</option>'; // Clear previous day options
+            for (let i = 1; i <= maxDays; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                nepDaySelect.appendChild(option);
+            }
+        }
+
+        // --- Placeholder Conversion Functions ---
+        // IMPORTANT: These are DUMMY functions. Replace with a real Nepali date conversion library.
+
+        /**
+         * Converts an English (AD) date string to a placeholder Nepali (BS) date string.
+         * @param {string} engDateString - The English date in 'YYYY-MM-DD' format.
+         * @returns {string} A placeholder Nepali date string or an error message.
+         */
+        function convertEngToNep(engDateString) {
+            if (!engDateString) {
+                displayResult(nepaliResultContainer, nepaliResultEl, "Please select an English date.", true);
+                return;
+            }
+            try {
+                const date = new Date(engDateString);
+                if (isNaN(date.getTime())) {
+                     displayResult(nepaliResultContainer, nepaliResultEl, "Invalid English date selected.", true);
+                    return;
+                }
+
+                const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
+
+                // ** DUMMY LOGIC **
+                const year = date.getFullYear() + 56; // Approximation
+                const monthOffset = 8; // Approximation for month part
+                let nepMonthIndex = (date.getMonth() + monthOffset) % 12;
+                let nepYear = year + Math.floor((date.getMonth() + monthOffset) / 12);
+                
+                // Further day adjustment (very rough)
+                let nepDay = date.getDate() + 15;
+                if (nepDay > 32) { // Max days in a Nepali month (approx)
+                    nepDay -= 30; // Simplified overflow
+                    nepMonthIndex = (nepMonthIndex + 1) % 12;
+                    if (nepMonthIndex === 0 && Math.floor((date.getMonth() + monthOffset) / 12) === 0 ) { // if it was December and wrapped
+                         nepYear++;
+                    }
+                }
+                 // Ensure nepMonthIndex is valid
+                nepMonthIndex = nepMonthIndex < 0 ? 11 + nepMonthIndex : nepMonthIndex;
+
+
+                const nepMonthName = NEPALI_MONTHS[nepMonthIndex] ? NEPALI_MONTHS[nepMonthIndex].name : "Unknown";
+
+                displayResult(nepaliResultContainer, nepaliResultEl, `${nepYear} ${nepMonthName} ${nepDay}, ${dayOfWeek}`);
+            } catch (e) {
+                displayResult(nepaliResultContainer, nepaliResultEl, "Error during conversion.", true);
+                console.error("Eng to Nep Conversion Error:", e);
+            }
+        }
+
+        /**
+         * Converts a Nepali (BS) date to a placeholder English (AD) date string.
+         * @param {string} nepYear - The Nepali year.
+         * @param {string} nepMonth - The Nepali month (1-12).
+         * @param {string} nepDay - The Nepali day.
+         * @returns {string} A placeholder English date string or an error message.
+         */
+        function convertNepToEng(nepYear, nepMonth, nepDay) {
+            if (!nepYear || !nepMonth || !nepDay) {
+                displayResult(englishResultContainer, englishResultEl, "Please select Nepali year, month, and day.", true);
+                return;
+            }
+            try {
+                // ** DUMMY LOGIC **
+                const year = parseInt(nepYear) - 56; // Approximation
+                const monthOffset = -8; // Approximation for month part
+                
+                let engMonthIndex = (parseInt(nepMonth) - 1 + monthOffset);
+                let engYear = year + Math.floor(engMonthIndex / 12);
+                engMonthIndex = (engMonthIndex % 12 + 12) % 12; // Ensure positive index
+
+                let engDay = parseInt(nepDay) - 15;
+                if (engDay <= 0) {
+                    engDay += 30; // Simplified underflow
+                    engMonthIndex = (engMonthIndex - 1 + 12) % 12; // Go to previous month
+                     if (engMonthIndex === 11 && Math.floor((parseInt(nepMonth) - 1 + monthOffset) / 12) !==0 ) { // if it was January and wrapped
+                        engYear--;
+                    }
+                }
+                engDay = Math.max(1, Math.min(31, engDay)); // Clamp day to a reasonable range
+
+                // Attempt to create a date to get month name and day of week
+                // This will be inaccurate due to the dummy conversion logic
+                const tempEngDate = new Date(engYear, engMonthIndex, engDay);
+                 if (isNaN(tempEngDate.getTime())) {
+                    displayResult(englishResultContainer, englishResultEl, "Could not form a valid English date from inputs.", true);
+                    return;
+                }
+
+                const monthName = tempEngDate.toLocaleDateString('en-US', { month: 'long' });
+                const dayOfWeek = tempEngDate.toLocaleDateString('en-US', { weekday: 'long' });
+
+                displayResult(englishResultContainer, englishResultEl, `${monthName} ${tempEngDate.getDate()}, ${tempEngDate.getFullYear()}, ${dayOfWeek}`);
+
+            } catch (e) {
+                 displayResult(englishResultContainer, englishResultEl, "Error during conversion.", true);
+                 console.error("Nep to Eng Conversion Error:", e);
+            }
+        }
+
+        // --- Event Listeners for Conversion Buttons ---
+        convertToNepaliBtn.addEventListener('click', () => {
+            const engDate = engDateInput.value;
+            // Re-select the element in case it was replaced by an error message
+            const currentNepaliResultEl = document.getElementById('nepaliResultDate') || nepaliResultContainer.querySelector('.date-value');
+            convertEngToNep(engDate);
+        });
+
+        convertToEnglishBtn.addEventListener('click', () => {
+            const nepYearVal = nepYearSelect.value;
+            const nepMonthVal = nepMonthSelect.value;
+            const nepDayVal = nepDaySelect.value;
+            // Re-select the element in case it was replaced by an error message
+            const currentEnglishResultEl = document.getElementById('englishResultDate') || englishResultContainer.querySelector('.date-value');
+            convertNepToEng(nepYearVal, nepMonthVal, nepDayVal);
+        });
+
+        // --- Initial Page Setup ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Populate Nepali date dropdowns
+            populateNepaliYears();
+            populateNepaliMonths();
+            populateNepaliDays(); // Initial population with max days (32)
+
+            // Set today's date in the English date picker by default
+            try {
+                const today = new Date();
+                // Adjust for timezone to get local 'YYYY-MM-DD'
+                const offset = today.getTimezoneOffset();
+                const todayLocal = new Date(today.getTime() - (offset*60*1000));
+                engDateInput.value = todayLocal.toISOString().split('T')[0];
+            } catch (e) {
+                console.warn("Could not set today's date automatically:", e);
+                // Fallback or leave empty if there's an issue
+            }
+
+
+            // Placeholder for dynamic day population (requires actual calendar data)
+            // For a real application, you would update the number of days in nepDaySelect
+            // when nepYearSelect or nepMonthSelect changes, using a Nepali calendar data source.
+            // e.g., nepMonthSelect.addEventListener('change', updateDaysForNepaliMonth);
+            // e.g., nepYearSelect.addEventListener('change', updateDaysForNepaliMonth);
+        });
+
+    </script>
+</body>
+</html>
